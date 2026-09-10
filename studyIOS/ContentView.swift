@@ -26,6 +26,7 @@ struct ContentView: View {
             
             Button(action:{
                 HeaderValue.init().addHeader(header: [Item(key: "test", value: "test_101")])
+                
                 model.refreshData()
             }){
                 Text("ios click").font(.largeTitle)

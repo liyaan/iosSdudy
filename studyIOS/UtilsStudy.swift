@@ -19,16 +19,40 @@ func onePrint(str:String) -> Bool {
    
 }
 
-func fetchData(url:String,httpMethod:String,compleSuccess:@escaping(Result<Data, Error>)->Void){
+private func fetchData(url:String,compleSuccess:@escaping(Result<Data, Error>)->Void){
     guard let requestUrl = URL(string: url) else{
         compleSuccess(.failure(NSError(domain: "Invalid URL", code: -1)))
         return
     }
     var request = URLRequest(url: requestUrl)
-    request.httpMethod = httpMethod
+    //httpMethod: "GET",
+    request.httpMethod = "GET"
+    SettingTask(requestUrl: request, compleSuccess: compleSuccess)
+}
 
+
+private func fetchDataPost(url:String,bodyDict: [Item]?,compleSuccess:@escaping(Result<Data, Error>)->Void){
+    guard let requestUrl = URL(string: url) else{
+        compleSuccess(.failure(NSError(domain: "Invalid URL", code: -1)))
+        return
+    }
+    var request = URLRequest(url: requestUrl)
+    //httpMethod: "GET",
+    request.httpMethod = "POST"
+    request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+    // 将字典转换为 JSON Data
+    if let strData = AppendString(dataValue: bodyDict) {
+        request.httpBody = strData.data(using: .utf8)
+        onePrint(str: strData)
+    }
+    SettingTask(requestUrl: request, compleSuccess: compleSuccess)
+}
+
+
+private func SettingTask(requestUrl:URLRequest,compleSuccess:@escaping(Result<Data, Error>)->Void){
+    var request = requestUrl
     // 设置单个 Header (会覆盖同名的旧值)
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+//    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     if (HeaderValue.init().getHeaderSize()>0) {
         HeaderValue.init().getHeader().forEach{ item in
             request.setValue("\(item.value)", forHTTPHeaderField: item.key)
@@ -58,7 +82,6 @@ func fetchData(url:String,httpMethod:String,compleSuccess:@escaping(Result<Data,
         
     }
     task.resume()
-    
 }
 
 func jsonElement<T: Decodable>(_entity:T.Type,data:Data,mainData:@escaping(T)->Void){
@@ -72,22 +95,33 @@ func jsonElement<T: Decodable>(_entity:T.Type,data:Data,mainData:@escaping(T)->V
         print("解析失败: \(error)")
     }
 }
-
-//get 请求 url请求地址  datavalue请求参数数组
-func getRequest(url:String,dataValue:[Item]?,compleSuccess:@escaping(Result<Data, Error>)->Void) {
+private func AppendString(dataValue:[Item]?)->String?{
     
-    var requestUrl = ""
     if let dataUrl = dataValue {
         let result = dataUrl.map { "\($0.key)=\($0.value)" }
             .joined(separator: "&")
         print("result \(result)")
-        requestUrl = "\(url)?\(result)"
+        return  result
+    }
+    return nil
+}
+//get 请求 url请求地址  datavalue请求参数数组
+func getRequest(url:String,dataValue:[Item]?,compleSuccess:@escaping(Result<Data, Error>)->Void) {
+    var requestUrl = ""
+    if let dataUrl = AppendString(dataValue: dataValue) {
+        requestUrl = "\(url)?\(dataUrl)"
     }else{
-        print("url \(url)")
         requestUrl = url
     }
     print("requestUrl \(requestUrl)")
-    fetchData(url: requestUrl, httpMethod: "GET",compleSuccess: compleSuccess)
+    fetchData(url: requestUrl, compleSuccess: compleSuccess)
+}
+
+//get 请求 url请求地址  datavalue请求参数数组
+func postRequest(url:String,bodyDict: [Item]?,compleSuccess:@escaping(Result<Data, Error>)->Void) {
+    
+
+    fetchDataPost(url: url, bodyDict: bodyDict, compleSuccess:compleSuccess)
 }
 
 struct Item {
