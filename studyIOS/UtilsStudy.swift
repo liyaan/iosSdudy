@@ -95,6 +95,28 @@ func jsonElement<T: Decodable>(_entity:T.Type,data:Data,mainData:@escaping(T)->V
         print("解析失败: \(error)")
     }
 }
+
+func requestData(result:Result<Data, Error>,successData:(Data)->Void){
+    switch result {
+    case .success(let data):
+        print("收到数据: \(data.count) bytes")
+        successData(data)
+//        jsonElement(_entity: MyRModel.self, data: data,mainData:{ model in
+//
+//            if(model.errorCode == 0){
+//                self.title = model.data!.nickname
+//                self.score = model.data!.id
+//            }else{
+//                self.title = model.errorMsg ?? "注册失败"
+//                self.score = -1
+//            }
+//
+//        })
+    case .failure(let error):
+        print("请求失败: \(error.localizedDescription)")
+    }
+}
+
 private func AppendString(dataValue:[Item]?)->String?{
     
     if let dataUrl = dataValue {

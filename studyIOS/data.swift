@@ -68,23 +68,46 @@ class HomeDataMode: ObservableObject{
                 Item(key: "password",value: "123456"),
                 Item(key: "repassword",value: "123456")
             ]
-            postRequest(url: "url", bodyDict: bodyDict, compleSuccess: {result in
-                switch result {
-                case .success(let data):
-                    print("收到数据: \(data.count) bytes")
+            postRequest(url: "user/register", bodyDict: bodyDict, compleSuccess: {result in
+                requestData(result: result, successData: { data in
+                    
+                    let str1: String? = nil
+                    let str2: String? = ""
+                    let str3: String? = "   "
+                    let str4: String? = "Hello"
+
+                    print(str1.isNilOrEmpty) // true
+                    print(str2.isNilOrEmpty) // true
+                    print(str3.isNilOrEmpty) // true
+                    print(str4.isNilOrEmpty) // false
+                    
                     jsonElement(_entity: MyRModel.self, data: data,mainData:{ model in
-                        if(model.errorCode == 0){
+                        model.errorCode.isZero(_isTrue: {
                             self.title = model.data!.nickname
                             self.score = model.data!.id
-                        }else{
-                            self.title = "注册失败"
+                        }, _isFalse: {
+                            self.title = model.errorMsg ?? "注册失败"
                             self.score = -1
-                        }
+                        })
                         
                     })
-                case .failure(let error):
-                    print("请求失败: \(error.localizedDescription)")
-                }
+                })
+//                switch result {
+//                case .success(let data):
+//                    print("收到数据: \(data.count) bytes")
+//                    jsonElement(_entity: MyRModel.self, data: data,mainData:{ model in
+//                        if(model.errorCode == 0){
+//                            self.title = model.data!.nickname
+//                            self.score = model.data!.id
+//                        }else{
+//                            self.title = model.errorMsg ?? "注册失败"
+//                            self.score = -1
+//                        }
+//
+//                    })
+//                case .failure(let error):
+//                    print("请求失败: \(error.localizedDescription)")
+//                }
             })
         }
 }
