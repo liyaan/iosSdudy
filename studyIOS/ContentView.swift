@@ -9,6 +9,9 @@ import SwiftUI
 struct ContentView: View {
     @State private var message = "初始数据"
     @ObservedObject var model = HomeDataMode()
+    init() {
+        model.refreshData()
+    }
     var body: some View {
         
         VStack(){
@@ -31,6 +34,7 @@ struct ContentView: View {
             }){
                 Text("ios click").font(.largeTitle)
             }
+            SwiftUIView(modelData: model)
         }
         
         
@@ -40,6 +44,7 @@ struct ContentView: View {
         print(result)
     }
 }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

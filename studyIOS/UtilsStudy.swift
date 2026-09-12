@@ -58,8 +58,6 @@ private func SettingTask(requestUrl:URLRequest,compleSuccess:@escaping(Result<Da
             request.setValue("\(item.value)", forHTTPHeaderField: item.key)
         }
     }
-    let value = request.value(forHTTPHeaderField: "test")
-    onePrint(str: value!)
     
     let task = URLSession.shared.dataTask(with: request){data,response,error in
         if let error = error{
